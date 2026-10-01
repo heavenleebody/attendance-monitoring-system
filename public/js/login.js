@@ -1,8 +1,13 @@
 // ===== Login form =====
+
+// ----- Precious updated this portion | October 1, 2026 | 8:48 PM -----
 document.getElementById('loginForm').addEventListener('submit', function (e) {
   e.preventDefault();
-  alert('Login submitted (connect this to your backend).');
+
+  // Temporary bypass for testing: go directly to Student Lookup
+  window.location.href = '/student';
 });
+// ----- End of Precious' update -----
 
 // ===== Password helpers =====
 function togglePassword(inputId, btn) {
@@ -32,6 +37,7 @@ function bindPasswordToggleVisibility(inputId, toggleId) {
 
 bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
 
+
 // ===== Forgot password popup =====
 (function () {
   const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -50,13 +56,16 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
     document.getElementById('stepCode'),
     document.getElementById('stepPass'),
   ];
+
   const subs = [
     "Enter your email or username and we'll send a 6-digit code.",
     'If an account matches, we sent a code. It expires in 10 minutes.',
     'Create a new password that meets all the rules below.',
   ];
+
   const focusIds = ['resetIdentifier', 'otp1', 'resetPass'];
-    // ----- Password strength (same logic as register) -----
+
+  // ----- Password strength (same logic as register) -----
   const passInput    = document.getElementById('resetPass');
   const confirmInput = document.getElementById('resetPass2');
   const strengthBox  = document.getElementById('resetStrength');
@@ -71,23 +80,33 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
     symbol: (v) => /[^A-Za-z0-9]/.test(v),
   };
 
-  const levelLabels = { 1: 'Weak', 2: 'Fair', 3: 'Strong', 4: 'Very Strong' };
+  const levelLabels = {
+    1: 'Weak',
+    2: 'Fair',
+    3: 'Strong',
+    4: 'Very Strong'
+  };
 
   function updateStrength() {
     const value = passInput.value;
 
     // Only show once the user types; hide again if emptied
     strengthBox.classList.toggle('visible', value.length > 0);
+
     if (value.length === 0) return;
 
     let score = 0;
+
     ruleItems.forEach(function (item) {
       const passed = rules[item.dataset.rule](value);
+
       item.classList.toggle('met', passed);
+
       if (passed) score++;
     });
 
     const level = Math.max(score, 1);
+
     barFill.dataset.level = level;
     levelText.textContent = levelLabels[level];
   }
@@ -100,22 +119,31 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
     [['resetPass', 'resetPassToggle'], ['resetPass2', 'resetPass2Toggle']].forEach(function (pair) {
       const input  = document.getElementById(pair[0]);
       const toggle = document.getElementById(pair[1]);
+
       input.type = 'password';
       toggle.classList.remove('visible');
       toggle.querySelector('.icon-eye').style.display = 'block';
       toggle.querySelector('.icon-eye-off').style.display = 'none';
     });
+
     updateStrength();
   }
 
   passInput.addEventListener('input', updateStrength);
-  let lastFocus = null, timer = null;
+
+  let lastFocus = null;
+  let timer = null;
 
   function showStep(i) {
     steps.forEach((f, n) => f.classList.toggle('active', n === i));
+
     sub.textContent = subs[i];
+
     clearErrors();
-    setTimeout(() => document.getElementById(focusIds[i]).focus(), 50);
+
+    setTimeout(() => {
+      document.getElementById(focusIds[i]).focus();
+    }, 50);
   }
 
   function clearErrors() {
@@ -128,18 +156,25 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
 
   function openReset(e) {
     e.preventDefault();
+
     lastFocus = document.activeElement;
+
     modal.classList.add('open');
     document.body.classList.add('modal-open');
+
     showStep(0);
   }
 
   function closeReset() {
     modal.classList.remove('open');
     document.body.classList.remove('modal-open');
+
     steps.forEach(f => f.reset());
+
     resetPasswordUI();
+
     clearInterval(timer);
+
     if (lastFocus) lastFocus.focus();
   }
 
@@ -153,19 +188,26 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
       },
       body: JSON.stringify(body),
     });
+
     const data = await res.json().catch(() => ({}));
+
     if (!res.ok) {
-      const msg = data.errors ? Object.values(data.errors)[0][0]
-                              : (data.message || 'Something went wrong. Try again.');
+      const msg = data.errors
+        ? Object.values(data.errors)[0][0]
+        : (data.message || 'Something went wrong. Try again.');
+
       throw new Error(msg);
     }
+
     return data;
   }
 
   async function submit(form, url, body, onDone) {
     const btn = form.querySelector('.submit-btn');
+
     btn.disabled = true;
     clearErrors();
+
     try {
       const data = await post(url, body);
       onDone(data);
@@ -178,14 +220,20 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
 
   function startCountdown() {
     const btn = document.getElementById('resendBtn');
+
     let s = 60;
+
     btn.disabled = true;
     btn.textContent = 'Resend code in ' + s + 's';
+
     clearInterval(timer);
+
     timer = setInterval(() => {
       s--;
+
       if (s <= 0) {
         clearInterval(timer);
+
         btn.disabled = false;
         btn.textContent = 'Resend code';
       } else {
@@ -196,26 +244,47 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
 
   steps[0].addEventListener('submit', e => {
     e.preventDefault();
-    submit(steps[0], urls.send,
-      { identifier: document.getElementById('resetIdentifier').value.trim() },
-      () => { showStep(1); startCountdown(); });
+
+    submit(
+      steps[0],
+      urls.send,
+      {
+        identifier: document.getElementById('resetIdentifier').value.trim()
+      },
+      () => {
+        showStep(1);
+        startCountdown();
+      }
+    );
   });
 
-    steps[1].addEventListener('submit', e => {
+  steps[1].addEventListener('submit', e => {
     e.preventDefault();
-    submit(steps[1], urls.verify,
-      { code: getCode() },
-      () => showStep(2));
+
+    submit(
+      steps[1],
+      urls.verify,
+      {
+        code: getCode()
+      },
+      () => showStep(2)
+    );
   });
 
-    steps[2].addEventListener('submit', e => {
+  steps[2].addEventListener('submit', e => {
     e.preventDefault();
 
     if (!allRulesMet()) {
       strengthBox.classList.add('visible');
       updateStrength();
-      showError(steps[2], "Your password doesn't meet all the rules yet.");
+
+      showError(
+        steps[2],
+        "Your password doesn't meet all the rules yet."
+      );
+
       passInput.focus();
+
       return;
     }
 
@@ -224,21 +293,27 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
       return;
     }
 
-    submit(steps[2], urls.reset,
+    submit(
+      steps[2],
+      urls.reset,
       {
         password: passInput.value,
         password_confirmation: confirmInput.value,
       },
       data => {
         closeReset();
+
         const status = document.getElementById('loginStatus');
+
         status.textContent = data.message;
         status.style.display = 'block';
-      });
+      }
+    );
   });
 
   document.getElementById('resendBtn').addEventListener('click', async () => {
     clearErrors();
+
     try {
       await post(urls.resend, {});
       startCountdown();
@@ -247,7 +322,8 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
     }
   });
 
-    // ----- OTP boxes -----
+
+  // ----- OTP boxes -----
   const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
 
   function getCode() {
@@ -255,10 +331,16 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
   }
 
   function fillFrom(index, digits) {
-    digits.split('').slice(0, otpBoxes.length - index).forEach((d, k) => {
-      otpBoxes[index + k].value = d;
-    });
-    otpBoxes[Math.min(index + digits.length, otpBoxes.length - 1)].focus();
+    digits
+      .split('')
+      .slice(0, otpBoxes.length - index)
+      .forEach((d, k) => {
+        otpBoxes[index + k].value = d;
+      });
+
+    otpBoxes[
+      Math.min(index + digits.length, otpBoxes.length - 1)
+    ].focus();
   }
 
   otpBoxes.forEach((box, i) => {
@@ -266,29 +348,42 @@ bindPasswordToggleVisibility('loginPass', 'loginPassToggle');
 
     box.addEventListener('input', () => {
       const digits = box.value.replace(/\D/g, '');
+
       box.value = '';
-      if (digits) fillFrom(i, digits); // handles typing, pasting, and autofill
+
+      if (digits) {
+        fillFrom(i, digits);
+      }
     });
 
     box.addEventListener('keydown', e => {
       if (e.key === 'Backspace' && !box.value && i > 0) {
         e.preventDefault();
+
         otpBoxes[i - 1].value = '';
         otpBoxes[i - 1].focus();
+
       } else if (e.key === 'ArrowLeft' && i > 0) {
         otpBoxes[i - 1].focus();
+
       } else if (e.key === 'ArrowRight' && i < otpBoxes.length - 1) {
         otpBoxes[i + 1].focus();
       }
     });
   });
 
-    bindPasswordToggleVisibility('resetPass', 'resetPassToggle');
-    bindPasswordToggleVisibility('resetPass2', 'resetPass2Toggle');
+
+  bindPasswordToggleVisibility('resetPass', 'resetPassToggle');
+  bindPasswordToggleVisibility('resetPass2', 'resetPass2Toggle');
 
   document.getElementById('openReset').addEventListener('click', openReset);
+
   document.getElementById('resetClose').addEventListener('click', closeReset);
+
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) closeReset();
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      closeReset();
+    }
   });
+
 })();
