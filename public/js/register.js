@@ -1,19 +1,20 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('registerForm');
-
-  form.addEventListener('submit', function (e) {
-    const pass = document.getElementById('regPass').value;
-    const confirm = document.getElementById('regPassConfirm').value;
-
-    if (pass !== confirm) {
-      e.preventDefault();
-      alert('Passwords do not match.');
-    }
-  });
-
-  bindPasswordToggleVisibility('regPass', 'regPassToggle');
-  bindPasswordToggleVisibility('regPassConfirm', 'regPassConfirmToggle');
-});
+// Randell updated this portion | October 4, 2026 | 11:36 AM | Removed the first copy of this block, it made the 'Passwords do not match' alert show twice (the second block below does the same)
+// Original: document.addEventListener('DOMContentLoaded', function () {
+// Original:   const form = document.getElementById('registerForm');
+// Original:
+// Original:   form.addEventListener('submit', function (e) {
+// Original:     const pass = document.getElementById('regPass').value;
+// Original:     const confirm = document.getElementById('regPassConfirm').value;
+// Original:
+// Original:     if (pass !== confirm) {
+// Original:       e.preventDefault();
+// Original:       alert('Passwords do not match.');
+// Original:     }
+// Original:   });
+// Original:
+// Original:   bindPasswordToggleVisibility('regPass', 'regPassToggle');
+// Original:   bindPasswordToggleVisibility('regPassConfirm', 'regPassConfirmToggle');
+// Original: });
 
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);

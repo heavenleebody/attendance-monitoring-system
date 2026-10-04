@@ -1,12 +1,15 @@
 // ===== Login form =====
 
 // ----- Precious updated this portion | October 1, 2026 | 8:48 PM -----
-document.getElementById('loginForm').addEventListener('submit', function (e) {
-  e.preventDefault();
+
+// Randell updated this portion | October 4, 2026 | 11:36 AM | Turned off the testing bypass so the form submits to POST /login
+// Original: document.getElementById('loginForm').addEventListener('submit', function (e) {
+// Original:   e.preventDefault();
 
   // Temporary bypass for testing: go directly to Student Lookup
-  window.location.href = '/student';
-});
+
+// Original:   window.location.href = '/student';
+// Original: });
 // ----- End of Precious' update -----
 
 // ===== Password helpers =====

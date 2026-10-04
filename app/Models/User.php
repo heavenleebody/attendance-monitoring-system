@@ -18,10 +18,14 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    // Randell updated this portion | October 4, 2026 | 11:36 AM | Added username and role so the register page can save them
+    // Original: protected $fillable = ['name', 'email', 'password'];
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
+        'role',
     ];
 
     /**

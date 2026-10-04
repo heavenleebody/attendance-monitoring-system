@@ -36,22 +36,34 @@
     </div>
 
     <!-- LOGIN FORM -->
-    <form id="loginForm" class="active">
+    @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Login form now posts to the server (it had no method, action or csrf token) @endphp
+    @php // Original: <form id="loginForm" class="active"> @endphp
+    <form id="loginForm" class="active" method="POST" action="{{ route('login.store') }}">
+      @csrf
       <div class="form-heading">
         <h2>Welcome Back!</h2>
         <p class="form-sub">Sign in to monitor attendance records.</p>
       </div>
 
-      <div class="hint success" id="loginStatus" style="display:none;"></div>
+      @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Shows 'Account created' after registering (still hidden otherwise, the reset popup uses it too) @endphp
+      @php // Original: <div class="hint success" id="loginStatus" style="display:none;"></div> @endphp
+      <div class="hint success" id="loginStatus" style="{{ session('status') ? '' : 'display:none;' }}">{{ session('status') }}</div>
 
       <div class="field">
         <label>Email / Username</label>
-        <input type="text" placeholder="Enter your email or username" required>
+        @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Added name, id and old value, plus the error message under the field @endphp
+        @php // Original: <input type="text" placeholder="Enter your email or username" required> @endphp
+        <input type="text" id="loginId" name="login" value="{{ old('login') }}" placeholder="Enter your email or username" required>
       </div>
+      @error('login')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
 
       <div class="field password-wrap">
         <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Enter your password">
+        @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Added name and required so the password is sent @endphp
+        @php // Original: <input type="password" id="loginPass" placeholder="Enter your password"> @endphp
+        <input type="password" id="loginPass" name="password" placeholder="Enter your password" required>
         <button type="button" class="toggle-pass" id="loginPassToggle" onclick="togglePassword('loginPass', this)">
           <svg class="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
           <svg class="icon-eye-off" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a21.6 21.6 0 015.06-6.06M9.9 4.24A10.9 10.9 0 0112 4c7 0 11 7 11 7a21.6 21.6 0 01-3.11 4.26M14.12 14.12a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -59,7 +71,9 @@
       </div>
 
       <div class="row-inline">
-        <label><input type="checkbox"> Remember me</label>
+        @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Added name so Remember me works @endphp
+        @php // Original: <label><input type="checkbox"> Remember me</label> @endphp
+        <label><input type="checkbox" name="remember" value="1"> Remember me</label>
         <a href="#" id="openReset" style="color:var(--maroon);">Forgot Password?</a>
       </div>
 

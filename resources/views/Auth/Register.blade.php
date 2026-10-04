@@ -37,7 +37,9 @@
     </div>
 
     <!-- REGISTER FORM -->
-    <form id="registerForm" class="active" method="POST" action="{{ route('register') }}">
+    @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Form posts to the new register.store route (same /register URL) @endphp
+    @php // Original: <form id="registerForm" class="active" method="POST" action="{{ route('register') }}"> @endphp
+    <form id="registerForm" class="active" method="POST" action="{{ route('register.store') }}">
       @csrf
 
       <div class="form-heading">
@@ -45,10 +47,31 @@
         <p class="form-sub">Register to start tracking attendance.</p>
       </div>
 
+      @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Split the one Email/Username box into Full Name, Username and Email (the users table needs all three) @endphp
+      @php // Original: <div class="field"><label for="email">Email/Username</label><input type="email" id="email" name="email" placeholder="Enter your email or username" required></div> @endphp
       <div class="field">
-        <label for="email">Email/Username</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email or username" required>
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" name="name" value="{{ old('name') }}" placeholder="Enter your full name" maxlength="255" required>
       </div>
+      @error('name')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="{{ old('username') }}" placeholder="Choose a username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_\-]+" title="Letters, numbers, dash and underscore only" required>
+      </div>
+      @error('username')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required>
+      </div>
+      @error('email')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
 
       <div class="field password-wrap">
         <label for="regPass">Password</label>
@@ -90,6 +113,11 @@
         </ul>
       </div>
 
+      @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Added the password error message (from the server rules) @endphp
+      @error('password')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
+
       <div class="field password-wrap">
         <label for="regPassConfirm">Confirm Password</label>
         <input type="password" id="regPassConfirm" name="password_confirmation" placeholder="Re-enter your password" required>
@@ -107,6 +135,11 @@
     <a href="#" data-terms-open="privacy">Privacy Policy</a>
   </label>
 </div>
+
+      @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Added the terms error message @endphp
+      @error('terms')
+        <div class="hint error">{{ $message }}</div>
+      @enderror
 
       <button type="submit" class="submit-btn">CREATE ACCOUNT</button>
 

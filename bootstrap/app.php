@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+
+        // Randell updated this portion | October 4, 2026 | 11:36 AM | A logged-in admin who opens /login or /register goes to the student lookup (default was /)
+        $middleware->redirectUsersTo('/student');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

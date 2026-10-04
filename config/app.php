@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Randell updated this portion | October 4, 2026 | 11:36 AM | Philippine time, so created_at and the OTP expiry match the clock
+    // Original: 'timezone' => 'UTC',
+    'timezone' => 'Asia/Manila',
 
     /*
     |--------------------------------------------------------------------------

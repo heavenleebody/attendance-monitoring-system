@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Campus Room Reservation — Student Number</title>
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin function: page title renamed @endphp
+    @php // Original: <title>Campus Room Reservation — Student Number</title> @endphp
+    <title>Iskedyul Admin — Student Lookup</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -133,10 +135,19 @@
 <body>
 
 <div class="card">
-    <a class="back-btn" href="{{ route('login') }}">&larr; Back to Login</a>
+    @php // Randell updated this portion | October 4, 2026 | 11:36 AM | Back to Login became Log Out (a logged-in admin is sent away from /login, so a link there would not work) @endphp
+    @php // Original: <a class="back-btn" href="{{ route('login') }}">&larr; Back to Login</a> @endphp
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="back-btn" style="cursor:pointer;">Log Out</button>
+    </form>
 
-    <h1>Student Information</h1>
-    <p class="sub">Enter Student ID to view student information.</p>
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin function: heading renamed @endphp
+    @php // Original: <h1>Student Information</h1> @endphp
+    <h1>Student Lookup</h1>
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin function: reworded for the admin @endphp
+    @php // Original: <p class="sub">Enter Student ID to view student information.</p> @endphp
+    <p class="sub">Enter a Student ID to check if the student is registered.</p>
 
     <label class="lbl" for="studentNumber">Student ID</label>
     <div class="field">
@@ -146,9 +157,13 @@
 
     <div class="divider"></div>
     
-    <div class="hint">If Student ID is not registered, register first.</div>
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin function: reworded for the admin @endphp
+    @php // Original: <div class="hint">If Student ID is not registered, register first.</div> @endphp
+    <div class="hint">Student ID not found? Register the student first.</div>
 
-    <a class="register-btn" href="{{ route('student.register') }}">Student Registration</a>
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin interface: button renamed and route renamed from student.register to admin.students.create @endphp
+    @php // Original: <a class="register-btn" href="{{ route('student.register') }}">Student Registration</a> @endphp
+    <a class="register-btn" href="{{ route('admin.students.create') }}">Register Student</a>
 
 </div>
 
@@ -181,7 +196,9 @@
     const notFoundModal = document.getElementById('notFoundModal');
     const notFoundClose = document.getElementById('notFoundClose');
     const bar      = document.getElementById('bar');
-    const CHECK_URL = @json(route('student.check'));
+    @php // Randell updated this portion | October 4, 2026 | 11:00 AM | Admin interface: route renamed from student.check to admin.lookup.check @endphp
+    @php // Original: const CHECK_URL = @json(route('student.check')); @endphp
+    const CHECK_URL = @json(route('admin.lookup.check'));
 
     let clockInterval = null, overlayTimer = null, busy = false;
 
@@ -262,9 +279,14 @@
 
     function showStudent(s) {
         document.getElementById('sName').textContent   = s.last_name + ', ' + s.first_name;
-        document.getElementById('sPhoto').src          = s.photo_url;
+        // Randell updated this portion | October 4, 2026 | 11:00 AM | Fix: students without a photo no longer show a broken image
+        // Original: document.getElementById('sPhoto').src          = s.photo_url;
+        document.getElementById('sPhoto').src          = s.photo_url || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><rect width='100%25' height='100%25' fill='%23ddd'/></svg>";
         document.getElementById('sNumber').textContent = s.student_number;
-        document.getElementById('sYSC').textContent    = s.year_level + ' - ' + s.section + ' ' + s.course;
+        // Randell updated this portion | October 4, 2026 | 11:00 AM | Fix: no more "null - null" when year level or section is empty
+        // Original: document.getElementById('sYSC').textContent    = s.year_level + ' - ' + s.section + ' ' + s.course;
+        const ys = [s.year_level, s.section].filter(Boolean).join(' - ');
+        document.getElementById('sYSC').textContent    = (ys ? ys + ' ' : '') + s.course;
 
         overlay.classList.add('show');
         tick();
