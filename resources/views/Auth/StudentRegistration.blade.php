@@ -66,7 +66,11 @@
                     <div class="course-option" onclick="selectCourse('Bachelor of Science in Education', 'BSED')">Bachelor of Science in Education</div>
                 </div>
 
-                <input type="hidden" id="course" name="course">
+                {{-- Randell updated this portion | October 5, 2026 | 10:41 PM | Course now uses the browser's own "fill out this field" bubble, same as the other fields --}}
+                {{-- Original: <input type="hidden" id="course" name="course"> --}}
+                <input type="text" id="course" name="course" required autocomplete="off" tabindex="-1" aria-hidden="true"
+                    style="position:absolute;left:0;bottom:0;width:100%;height:1px;padding:0;border:0;opacity:0;pointer-events:none;"
+                    oninvalid="this.setCustomValidity('Please select the student\'s course.')">
             </div>
         </div>
 
@@ -106,6 +110,18 @@
     </form>
 </div>
 
+{{-- Randell updated this portion | October 5, 2026 | 10:51 PM | Added: themed "no photo" prompt, replaces the browser confirm box (that one shows "Code" as its title and cannot be renamed) --}}
+<div id="noPhotoPopup" class="popup-overlay">
+    <div class="success-popup">
+        <h3>No Photo Added</h3>
+        <p>This student has no photo yet. Register without one, or go back and add it?</p>
+        <div class="button-row">
+            <button type="button" class="cancel-btn" id="noPhotoBack">GO BACK</button>
+            <button type="button" class="submit-btn" id="noPhotoProceed">REGISTER ANYWAY</button>
+        </div>
+    </div>
+</div>
+
 <div id="successPopup" class="popup-overlay">
     <div class="success-popup">
         <div class="success-icon">✓</div>
@@ -139,6 +155,8 @@ function selectCourse(name,value){
     selected.textContent=name;
     selected.style.color="var(--text)";
     document.getElementById("course").value=value;
+    // Randell updated this portion | October 5, 2026 | 10:41 PM | Clears the course bubble message once a course is picked
+    document.getElementById("course").setCustomValidity("");
     dropdown.classList.remove("open");
 }
 
@@ -147,6 +165,27 @@ document.addEventListener("click",function(e){
         dropdown.classList.remove("open");
     }
 });
+
+// Randell updated this portion | October 5, 2026 | 10:51 PM | Added: shows the no photo prompt and waits for the answer (true = register anyway, false = go back)
+function askNoPhoto(){
+    return new Promise(function(resolve){
+        const popup=document.getElementById("noPhotoPopup");
+        const backBtn=document.getElementById("noPhotoBack");
+        const proceedBtn=document.getElementById("noPhotoProceed");
+
+        function answer(result){
+            popup.classList.remove("show");
+            backBtn.onclick=null;
+            proceedBtn.onclick=null;
+            resolve(result);
+        }
+
+        backBtn.onclick=function(){answer(false);};
+        proceedBtn.onclick=function(){answer(true);};
+        popup.classList.add("show");
+        backBtn.focus(); // Enter key goes back by default, so a quick Enter cannot skip the photo by accident
+    });
+}
 
 // Randell updated this portion | October 4, 2026 | 11:00 AM | Made async so it can wait for the database save
 // Original: form.addEventListener("submit",function(e){
@@ -160,6 +199,14 @@ form.addEventListener("submit",async function(e){
         return;
     }
 
+    // Randell updated this portion | October 5, 2026 | 10:51 PM | Photo is optional, but asks first (themed prompt instead of the browser confirm box)
+    // Original: if(!confirm("No photo was uploaded for this student.\n\nPress OK to register without a photo, or Cancel to go back and add one.")){ return; }
+    if(!photoInput.files.length){
+        if(!(await askNoPhoto())){
+            return;
+        }
+    }
+
     // Randell updated this portion | October 4, 2026 | 11:00 AM | Added: saves the student to the database first, the popup only shows if it worked
     const saveBtn=form.querySelector(".submit-btn");
     const data=new FormData();
@@ -169,6 +216,8 @@ form.addEventListener("submit",async function(e){
     data.append("course",document.getElementById("course").value);
     data.append("year_level",document.getElementById("yearLevel").value);
     data.append("section",document.getElementById("section").value.trim());
+    // Randell updated this portion | October 5, 2026 | 10:46 PM | Photo is optional again, only attach it when there is one
+    // Original: if(photoInput.files.length){ data.append("photo",photoInput.files[0]); }
     if(photoInput.files.length){
         data.append("photo",photoInput.files[0]);
     }
